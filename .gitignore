@@ -1,0 +1,85 @@
+﻿# Зависимости (если используете vendor)
+/vendor/
+
+# Бинарные файлы
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.o
+*.a
+*.bin
+
+# Директория бинарников Go (если собираете через go install)
+/bin/
+
+# Временные файлы
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+*.log
+*.cache
+
+# Файлы с секретами и конфигурацией
+.env
+.env.local
+.env.production
+.env.development
+*.env
+*.pem
+*.key
+*.crt
+
+# Директории с моделями (они обычно большие)
+/models/*
+!/models/.gitkeep
+
+# Аудиофайлы (если бот сохраняет временные)
+/tmp/
+/audio/
+*.mp3
+*.wav
+*.ogg
+*.m4a
+
+# IDE и редакторы
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Системные файлы Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.BIN/
+*.lnk
+
+# Тестовые покрытия
+coverage.txt
+coverage.html
+coverage.out
+*.coverprofile
+profile.out
+
+# Результаты тестов
+/test-results/
+/test.log
+
+# Файлы релизов
+/dist/
+/release/
+
+# Файлы отладки Go
+debug
+debug.test
