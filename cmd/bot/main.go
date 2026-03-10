@@ -22,6 +22,10 @@ func main() {
 	// Проверка
 	log.Printf("Бот авторизован как %s", bot.UserName())
 
-	// TODO: обработка сообщений
-	log.Println("Бот готов к работе!")
+	// Запуск бота
+	if err := bot.Start(); err != nil {
+		log.Fatal("Ошибка запуска бота:", err)
+	}
+
+	select {}
 }
