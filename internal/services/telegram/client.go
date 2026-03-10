@@ -19,7 +19,7 @@ func NewBot(cfg *config.Config) (*Bot, error) {
 	return &Bot{api: bot, config: cfg}, nil
 }
 
-func (b Bot) UserName() string {
+func (b *Bot) UserName() string {
 	return b.api.Self.UserName
 }
 
@@ -35,13 +35,43 @@ func (b *Bot) Start() error {
 	return nil
 }
 
-func (b Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
+func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message == nil {
 			continue
 		}
 
-		log.Printf("[%s]: %s", update.Message.From.UserName, update.Message.Text)
-		//TODO: обработка разных типов сообщений
+		var text string
+		if update.Message.IsCommand() {
+			switch update.Message.Command() {
+			case "start":
+				text = "Привет, я бот для преобразования голосовых сообщений и аудио файлов в текст. " +
+					"А возможно и не только :) используй /help для помощи"
+			case "help":
+				text = "Для преобразования аудио в текст просто отправь мне запись"
+			default:
+				text = "Извини, но я не знаю такой комманды("
+			}
+		} else if update.Message.Voice != nil {
+			text = "Скоро научусь обрабатывать голосовые сообщения и аудио)"
+		} else if update.Message.Text != "" {
+			text = "Отправь аудио или голосовое и я его обработаю"
+		} else {
+			text = "Не умею работать с таким типом файлов(("
+		}
+
+		msg := tgbotapi.NewMessage(
+			update.Message.Chat.ID,
+			text)
+		_, err := b.api.Send(msg)
+		if err != nil {
+			log.Println("Ошибка отправки сообщения:", err)
+		}
+
+		if update.Message.IsCommand() || update.Message.Text != "" {
+			log.Printf("[%s]: %s", update.Message.From.UserName, update.Message.Text)
+		} else {
+			log.Printf("[%s]: Аудио/видео/файл", update.Message.From.UserName)
+		}
 	}
 }
