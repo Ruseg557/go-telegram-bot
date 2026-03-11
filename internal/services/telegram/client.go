@@ -11,6 +11,7 @@ type Bot struct {
 	api    *tgbotapi.BotAPI
 }
 
+// NewBot Дает боту информацию о токене
 func NewBot(cfg *config.Config) (*Bot, error) {
 	bot, err := tgbotapi.NewBotAPI(cfg.BotToken)
 	if err != nil {
@@ -19,10 +20,12 @@ func NewBot(cfg *config.Config) (*Bot, error) {
 	return &Bot{api: bot, config: cfg}, nil
 }
 
+// UserName Возвращает имя бота
 func (b *Bot) UserName() string {
 	return b.api.Self.UserName
 }
 
+// Start запускает канал для сообщений
 func (b *Bot) Start() error {
 
 	upd := tgbotapi.NewUpdate(0)
@@ -35,6 +38,7 @@ func (b *Bot) Start() error {
 	return nil
 }
 
+// handleUpdates обрабатывает сообщения
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message == nil {
