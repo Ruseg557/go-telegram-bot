@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"github.com/Ruseg557/go-telegram-bot/internal/config"
+	"github.com/Ruseg557/go-telegram-bot/internal/services/transcriber"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"io"
 	"log"
@@ -11,17 +12,21 @@ import (
 )
 
 type Bot struct {
-	config *config.Config
-	api    *tgbotapi.BotAPI
+	config      *config.Config
+	api         *tgbotapi.BotAPI
+	transcriber *transcriber.Service
 }
 
-// NewBot Дает боту информацию о токене
+// NewBot Создаем бота
 func NewBot(cfg *config.Config) (*Bot, error) {
 	bot, err := tgbotapi.NewBotAPI(cfg.BotToken)
 	if err != nil {
 		return nil, err
 	}
-	return &Bot{api: bot, config: cfg}, nil
+
+	tr := transcriber.New(cfg.ModelPath)
+
+	return &Bot{api: bot, config: cfg, transcriber: tr}, nil
 }
 
 // UserName Возвращает имя бота
@@ -92,8 +97,13 @@ func (b *Bot) handleVoice(message *tgbotapi.Message) string {
 		message.Voice.Duration,
 		message.Voice.FileSize/1024/1024)
 
-	// TODO: Обработка аудио
-	return "Скоро научусь обрабатывать"
+	text, err := b.transcriber.Transcribe(fileName)
+	if err != nil {
+		log.Println("Ошибка распознования:", err)
+		return "Не удалось распознать речь"
+	}
+
+	return "Распознанный текст:\n\n" + text
 }
 
 // handleUpdates обрабатывает сообщения
