@@ -64,6 +64,6 @@ func (s *Service) Transcribe(filePath string) (string, error) {
 		text = "[Распознано, но текст пуст]"
 	}
 
-	log.Printf("✅ Распознано: %s", text)
+	log.Printf("Распознано: %s", text)
 	return text, nil
 }

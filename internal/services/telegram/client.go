@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Bot struct {
@@ -100,8 +101,17 @@ func (b *Bot) handleVoice(message *tgbotapi.Message) string {
 	text, err := b.transcriber.Transcribe(fileName)
 	if err != nil {
 		log.Println("Ошибка распознования:", err)
-		return "Не удалось распознать речь"
+		os.Remove(fileName)
+
+		return "Не удалось распознать речь, попробуй ещё раз"
 	}
+
+	if err := os.Remove(fileName); err != nil {
+		log.Printf("Не удалось удалить временный файл %s: %v", fileName, err)
+	}
+
+	txtFile := strings.TrimSuffix(fileName, ".ogg") + ".txt"
+	os.Remove(txtFile)
 
 	return "Распознанный текст:\n\n" + text
 }
