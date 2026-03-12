@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	BotToken  string
-	ModelPath string
-	DebugMode bool
+	BotToken          string
+	ModelPath         string
+	WhisperExecutable string
+	DebugMode         bool
 }
 
 func Load() (*Config, error) {
@@ -21,9 +22,10 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{
-		BotToken:  os.Getenv("TELEGRAM_BOT_TOKEN"),
-		ModelPath: os.Getenv("WHISPER_MODEL_PATH"),
-		DebugMode: os.Getenv("DEBUG_MODE") == "true",
+		BotToken:          os.Getenv("TELEGRAM_BOT_TOKEN"),
+		ModelPath:         os.Getenv("WHISPER_MODEL_PATH"),
+		WhisperExecutable: os.Getenv("WHISPER_EXECUTABLE"),
+		DebugMode:         os.Getenv("DEBUG_MODE") == "true",
 	}
 
 	// Проверяем обязательные поля
@@ -33,7 +35,7 @@ func Load() (*Config, error) {
 
 	// Устанавливаем значения по умолчанию
 	if cfg.ModelPath == "" {
-		cfg.ModelPath = "models/ggml-base.bin"
+		cfg.ModelPath = "models/ggml-medium.bin"
 		log.Printf("Использую путь к модели по умолчанию: %s", cfg.ModelPath)
 	}
 

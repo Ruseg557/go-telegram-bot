@@ -24,7 +24,7 @@ func NewBot(cfg *config.Config) (*Bot, error) {
 		return nil, err
 	}
 
-	tr := transcriber.New(cfg.ModelPath)
+	tr := transcriber.New(cfg.ModelPath, cfg.WhisperExecutable)
 
 	return &Bot{api: bot, config: cfg, transcriber: tr}, nil
 }
