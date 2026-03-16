@@ -50,13 +50,11 @@ func (b *Bot) Start() error {
 
 // TODO: Поднять локальный сервер. Убрать ограничение в 50 МБ
 
-// handleVoice обрабатывает голосовые сообщения
-func (b *Bot) handleVoice(message *tgbotapi.Message) string {
+// downloadAndTranscribe скачивает и транскрибирует аудио(голосовые, файлы)
+func (b *Bot) downloadAndTranscribe(message *tgbotapi.Message, fileID, fileName string) string {
 	if err := os.MkdirAll("temp", os.ModePerm); err != nil {
 		log.Println("Ошибка создания папки temp:", err)
 	}
-
-	fileID := message.Voice.FileID
 
 	file, err := b.api.GetFile(tgbotapi.FileConfig{FileID: fileID})
 	if err != nil {
@@ -65,8 +63,6 @@ func (b *Bot) handleVoice(message *tgbotapi.Message) string {
 	}
 
 	fileURL := file.Link(b.api.Token)
-
-	fileName := filepath.Join("temp", fileID+".ogg")
 
 	response, err := http.Get(fileURL)
 	if err != nil {
@@ -92,7 +88,7 @@ func (b *Bot) handleVoice(message *tgbotapi.Message) string {
 		return "Возникла ошибка"
 	}
 
-	log.Printf("Голосовое сообщение от %s сохранено: %s (длительность: %dс, размер: %d Мбайт)",
+	log.Printf("Аудио от %s сохранено: %s (длительность: %dс, размер: %d Мбайт)",
 		message.From.UserName,
 		fileName,
 		message.Voice.Duration,
@@ -114,6 +110,15 @@ func (b *Bot) handleVoice(message *tgbotapi.Message) string {
 	os.Remove(txtFile)
 
 	return "Распознанный текст:\n\n" + text
+}
+
+// handleVoice обрабатыает голосовые сообщения
+func (b *Bot) handleVoice(message *tgbotapi.Message) string {
+	fileID := message.Voice.FileID
+
+	fileName := filepath.Join("temp", fileID+".ogg")
+
+	return b.downloadAndTranscribe(message, fileID, fileName)
 }
 
 // handleUpdates обрабатывает сообщения
