@@ -19,12 +19,12 @@ func New(modelPath, executable string) *Service {
 }
 
 // convertToWav конвертирует OGG в WAV через FFmpeg
-func (s *Service) convertToWav(oggPath string) (string, error) {
-	wavPath := strings.TrimSuffix(oggPath, ".ogg") + ".wav"
+func (s *Service) convertToWav(oldPath string) (string, error) {
+	wavPath := strings.TrimSuffix(oldPath, ".ogg") + ".wav"
 
 	// ffmpeg -i input.ogg -ar 16000 -ac 1 -c:a pcm_s16le output.wav
 	cmd := exec.Command("ffmpeg",
-		"-i", oggPath,
+		"-i", oldPath,
 		"-ar", "16000", // частота 16kHz
 		"-ac", "1", // моно
 		"-c:a", "pcm_s16le", // 16-bit PCM
@@ -51,13 +51,13 @@ func (s *Service) Transcribe(filePath string) (string, error) {
 		return "", fmt.Errorf("файл не найден: %s", filePath)
 	}
 
-	// Конвертируем OGG в WAV
+	// Конвертируем в WAV
 	wavPath, err := s.convertToWav(filePath)
 	if err != nil {
 		return "", fmt.Errorf("конвертация не удалась: %w", err)
 	}
 
-	// Удаляем WAV после обработки
+	// Удаляем файлы после обработки
 	defer func() {
 		if err := os.Remove(wavPath); err != nil {
 			log.Printf("Не удалось удалить WAV файл %s: %v", wavPath, err)
